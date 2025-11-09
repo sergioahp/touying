@@ -229,6 +229,12 @@
   if target() == "html" {
     // JavaScript needs to be in a string
     let js-content = ```
+      // Guard to prevent multiple initializations
+      if (window.touyingInitialized) {
+        console.log('Touying already initialized, skipping...');
+      } else {
+        window.touyingInitialized = true;
+
       let currentSlide = 0;
       let currentSubslide = 0;
       let slides = [];
@@ -236,6 +242,7 @@
 
       function initSlideshow() {
         slides = document.querySelectorAll('.touying-slide');
+        console.log('Found', slides.length, 'slides');
         if (slides.length === 0) return;
 
         slides.forEach((slide, idx) => {
@@ -243,7 +250,16 @@
           subslides[idx] = subslideCount;
         });
 
-        showSlide(0, 0);
+        // Find first non-empty slide
+        let firstSlide = 0;
+        for (let i = 0; i < slides.length; i++) {
+          if (slides[i].textContent.trim().length > 0) {
+            firstSlide = i;
+            break;
+          }
+        }
+
+        showSlide(firstSlide, 0);
         updateControls();
         updateProgress();
       }
@@ -387,6 +403,8 @@
       } else {
         initSlideshow();
       }
+
+      } // End of guard
     ```.text
 
     html.elem("script", js-content)
