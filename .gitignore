@@ -3,4 +3,6 @@
 .DS_Store
 
 *.pdf
-*.pdfpc
+*.pdfpctest-*.png
+test-html-export.html
+test-html-export.pdf

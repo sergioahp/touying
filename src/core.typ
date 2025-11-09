@@ -2,6 +2,7 @@
 #import "utils.typ"
 #import "pdfpc.typ"
 #import "components.typ"
+#import "html-utils.typ" as html-utils
 
 /// ------------------------------------------------
 /// Slides
@@ -2278,8 +2279,18 @@
       ..bodies,
     )
     header = page-preamble(self) + header
-    set page(..(self.page + page-extra-args + (header: header, footer: footer)))
-    setting-fn(subslide-preamble(self) + composer-with-side-by-side(..conts))
+    context {
+      if target() == "html" {
+        html-utils.html-slide(
+          slide-number: repeat,
+          subslide-count: 1,
+          setting-fn(subslide-preamble(self) + composer-with-side-by-side(..conts))
+        )
+      } else {
+        set page(..(self.page + page-extra-args + (header: header, footer: footer)))
+        setting-fn(subslide-preamble(self) + composer-with-side-by-side(..conts))
+      }
+    }
   } else {
     // render all the subslides
     let result = ()
@@ -2297,15 +2308,27 @@
       )
       let new-header = page-preamble(self) + header
       // update the counter in the first subslide only
-      result.push({
-        set page(
-          ..(
-            self.page + page-extra-args + (header: new-header, footer: footer)
-          ),
-        )
-        setting-fn(
-          subslide-preamble(self) + composer-with-side-by-side(..conts),
-        )
+      result.push(context {
+        if target() == "html" {
+          // For HTML, wrap in a div instead of using page settings
+          html-utils.html-slide(
+            slide-number: i,
+            subslide-count: repeat,
+            setting-fn(
+              subslide-preamble(self) + composer-with-side-by-side(..conts),
+            )
+          )
+        } else {
+          // For PDF/other formats, use page settings
+          set page(
+            ..(
+              self.page + page-extra-args + (header: new-header, footer: footer)
+            ),
+          )
+          setting-fn(
+            subslide-preamble(self) + composer-with-side-by-side(..conts),
+          )
+        }
       })
     }
     // return the result

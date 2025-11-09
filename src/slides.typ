@@ -2,6 +2,7 @@
 #import "configs.typ"
 #import "core.typ"
 #import "magic.typ"
+#import "html-utils.typ" as html-utils
 
 /// Touying slides function.
 ///
@@ -45,6 +46,14 @@
       if type(self.info.date) in (datetime,) { (date: self.info.date) } else {}
     ),
   )
+
+  // Inject HTML CSS and show rules
+  html-utils.inject-presentation-css(theme-colors: self.colors)
+
+  // HTML show rules for proper rendering
+  show math.equation: html-utils.fix-math
+  show raw.where(block: true): html-utils.fix-code
+  show image: html-utils.fix-image
 
   // get the init function
   let init = if "init" in self.methods and type(self.methods.init) == function {
@@ -122,4 +131,8 @@
   show: core.split-content-into-slides.with(self: self, is-first-slide: true)
 
   body
+
+  // Inject HTML navigation after content
+  html-utils.inject-navigation-js()
+  html-utils.html-navigation()
 }
