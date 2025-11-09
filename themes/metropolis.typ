@@ -88,11 +88,19 @@
       footer: footer,
     ),
   )
-  let new-setting = body => {
-    show: std.align.with(self.store.align)
-    set text(fill: self.colors.neutral-darkest)
-    show: setting
-    body
+  let new-setting = body => context {
+    // Only apply align show rule in non-HTML targets
+    let content = {
+      set text(fill: self.colors.neutral-darkest)
+      show: setting
+      body
+    }
+    if target() != "html" {
+      show: std.align.with(self.store.align)
+      content
+    } else {
+      content
+    }
   }
   touying-slide(
     self: self,

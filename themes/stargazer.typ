@@ -96,10 +96,17 @@
   if footer != auto {
     self.store.footer = footer
   }
-  let new-setting = body => {
-    show: std.align.with(self.store.align)
-    show: setting
-    body
+  let new-setting = body => context {
+    let content = {
+      show: setting
+      body
+    }
+    if target() != "html" {
+      show: std.align.with(self.store.align)
+      content
+    } else {
+      content
+    }
   }
   touying-slide(
     self: self,
